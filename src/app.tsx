@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 export function App() {
-  const [inputValue, setInputValue] = useState("");
   const [todos, setTodos] = useState([
     {
       id: 1,
@@ -18,8 +17,8 @@ export function App() {
   ]);
 
   function addNewTask() {
-    const newId = todos[todos.length - 1].id + 1;
-    setTodos([...todos, { id: newId, title: inputValue }]);
+    // const newId = todos[todos.length - 1].id + 1;
+    // setTodos([...todos, { id: newId, title: inputValue }]);
   }
 
   function deleteTodo(id: number) {
@@ -33,16 +32,15 @@ export function App() {
   return (
     <div>
       <h1>Todo List</h1>
-      <div>
-        <input
-          onChange={(event) => setInputValue(event.target.value)}
-          type="text"
-          placeholder="Add your task"
-        />
+
+      {/* TODO: Implement with form submit */}
+      <form>
+        <input type="text" placeholder="Add your task" />
         <div>
-          <button onClick={addNewTask}>Submit</button>
+          <button type="submit">Submit</button>
         </div>
-      </div>
+      </form>
+
       <ul>
         {todos.map((todo) => (
           <li key={todo.id}>
