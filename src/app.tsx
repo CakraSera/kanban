@@ -1,20 +1,32 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TaskCard } from "./components/task-card";
+import type { Task } from "./types/task";
+import { _ } from "node_modules/tailwindcss/dist/colors-b_6i0Oi7";
 
 export function App() {
-  const [todos, setTodos] = useState([
+  const [tasks, setTasks] = useState<Task[]>([
     {
       id: 1,
       title: "Walk the dog",
+      description: "Take the dog for a walk in the park",
+      completed: false,
+      createdAt: new Date("2023-10-01"),
     },
     {
       id: 2,
       title: "Water the plants",
+      description: "Water the plants in the garden",
+      completed: false,
+      createdAt: new Date("2023-10-02"),
     },
     {
       id: 3,
       title: "Wash the dishes",
+      description: "Wash the dishes after dinner",
+      completed: false,
+      createdAt: new Date("2023-10-03"),
     },
   ]);
 
@@ -26,34 +38,48 @@ export function App() {
       console.error("Please enter a task");
       return;
     }
-    const newId = todos[todos.length - 1].id + 1;
-    setTodos([...todos, { id: newId, title: task }]);
+    const newId = task[task.length - 1].id + 1;
+    setTasks([...tasks, { id: newId, title: task }]);
   }
 
-  function deleteTodo(id: number) {
-    const newTodos = todos.filter((todo) => todo.id != id);
-    setTodos(newTodos);
+  function editTask(titleTask: string, id: number) {
+    console.log("🚀 ~ editTask ~ id:", id);
+    console.log("🚀 ~ editTask ~ titleTask:", titleTask);
+    const taskToEdit = tasks.find((task) => task.id === id);
+    if (!taskToEdit) {
+      console.error("Task not found");
+      return;
+    }
+    const updatedTask = { ...taskToEdit, title: titleTask };
+    const newTasks = tasks.map((task) => (task.id === id ? updatedTask : task));
+    setTasks(newTasks);
+  }
+
+  function deleteTask(id: number) {
+    const newTodos = tasks.filter((task) => task.id != id);
+    setTasks(newTodos);
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Todo List</h1>
-      <div>
-        <form onSubmit={(event) => addNewTask(event)}>
-          <Input name="task" type="text" placeholder="Add Your Task" />
-          <div>
-            <Button type="submit">Submit</Button>
-          </div>
-        </form>
-      </div>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id} className="border-2 width-1/2">
-            <span>{todo.title} </span>
-            <button onClick={() => deleteTodo(todo.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+      <section>
+        <h1 className="text-2xl font-bold">Task List</h1>
+        <div>
+          <form onSubmit={(event) => addNewTask(event)} className="flex gap-2">
+            <Input name="task" type="text" placeholder="Add Your Task" />
+            <div>
+              <Button type="submit">Submit</Button>
+            </div>
+          </form>
+        </div>
+        <ul className="mt-4 space-y-2">
+          {tasks.map((task) => (
+            <li key={task.id}>
+              <TaskCard task={task} onDelete={deleteTask} onEdit={editTask} />
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
