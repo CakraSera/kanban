@@ -1,54 +1,61 @@
-# React + TypeScript + Vite
+# Kanban
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple and intuitive Kanban board application built with React, Tailwind CSS, and TypeScript.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This application provides a visual way to manage tasks through different stages, typically represented as columns. You can easily create, move, and organize your tasks to streamline your workflow.
 
-## Expanding the ESLint configuration
+## Key Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Board Creation:** Easily create new Kanban boards to organize different projects or areas of work.
+- **Column Management:** Add, remove, and rename columns to match your specific workflow stages (e.g., To Do, In Progress, Done).
+- **Task Management:**
+  - Create new tasks with descriptions.
+  - Drag and drop tasks between columns to update their status.
+  - View and potentially edit task details (future enhancement).
+- **Simple and Clean Interface:** Focuses on usability and ease of navigation.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
-```
+## Technologies Used
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- **React:** A JavaScript library for building user interfaces.
+- **Tailwind CSS:** A utility-first CSS framework for styling applications.
+- **Shadcn UI:** A component library providing accessible UI components that are easily customizable with Tailwind CSS.
+- **TypeScript:** Adds static typing to JavaScript, enhancing code maintainability and reducing errors.
+- **Vite:** A fast build tool that provides a quick and efficient development experience.
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+## Getting Started
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    "react-x": reactX,
-    "react-dom": reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs["recommended-typescript"].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-});
-```
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/CakraSera/kanban.git
+    cd kanban
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    npm install  # or yarn install
+    ```
+
+3.  **Start the development server:**
+
+    ```bash
+    npm dev  # or yarn start
+    ```
+
+    This will typically run the application at `http://localhost:5173`.
+
+## Usage
+
+Once the application is running, you can:
+
+- Create a new board (if this functionality is implemented in the UI).
+- Add new columns by clicking the "Add Column" (or a similar) button.
+- Create new tasks within a column using the "Add Task" (or a similar) button.
+- Drag and drop tasks between columns to update their status.
+
+## Contributing
+
+I would like to thank my mentor, [M Haidar Hanif](https://github.com/mhaidarhanif), for their guidance.
