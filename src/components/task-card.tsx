@@ -42,7 +42,8 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   console.log("🚀 ~ TaskCard ~ isHovered:", isHovered);
   return (
     <Card
-      className="flex flex-row items-center justify-evenly p-4"
+      className="relative overflow-hidden transition-all duration-300"
+      // className="flex flex-row items-center justify-evenly p-4 "
       onMouseEnter={() => {
         console.log("onMouseEnter");
         setIsHovered(true);
@@ -52,7 +53,7 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
       {!edit ? (
         <>
           <CardHeader>
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2">
               <Checkbox id="task" />
               <Label htmlFor="task">
                 <CardTitle>{task.title}</CardTitle>
@@ -63,19 +64,7 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
             <p>{task.description}</p>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" size="icon" onClick={() => setEdit(true)}>
-              <Edit className="h-4 w-4" />
-              <span className="sr-only">Edit</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => onDelete(Number(task.id))}
-            >
-              <Trash2 className="h-4 w-4" />
-              <span className="sr-only">Delete</span>
-            </Button>
-            {/* <div
+            <div
               className={`absolute top-2 right-2 flex gap-2 opacity-100 transition-opacity duration-300 ${
                 isHovered ? "opacity-100" : "opacity-0"
               }`}
@@ -96,7 +85,7 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Delete</span>
               </Button>
-            </div> */}
+            </div>
           </CardFooter>
         </>
       ) : (
