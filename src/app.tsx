@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { nanoid } from "nanoid";
 import { TaskCard } from "./components/task-card";
 import type { Task } from "./types/task";
-import { _ } from "node_modules/tailwindcss/dist/colors-b_6i0Oi7";
+import { TaskForm } from "./components/task-form";
 
 export function App() {
   const [tasks, setTasks] = useState<Task[]>([
@@ -34,15 +35,26 @@ export function App() {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const task: string | undefined = formData.get("task")?.toString();
+    console.log("🚀 ~ addNewTask ~ task:", task);
     if (!task) {
       console.error("Please enter a task");
       return;
     }
-    const newId = task[task.length - 1].id + 1;
-    setTasks([...tasks, { id: newId, title: task }]);
+    const newId = nanoid();
+    console.log("🚀 ~ addNewTask ~ newId:", newId);
+    setTasks([
+      ...tasks,
+      {
+        id: newId,
+        title: task,
+        description: "",
+        completed: false,
+        createdAt: new Date(),
+      },
+    ]);
   }
 
-  function editTask(titleTask: string, id: number) {
+  function editTask(titleTask: string, id: number | string) {
     console.log("🚀 ~ editTask ~ id:", id);
     console.log("🚀 ~ editTask ~ titleTask:", titleTask);
     const taskToEdit = tasks.find((task) => task.id === id);
@@ -55,7 +67,7 @@ export function App() {
     setTasks(newTasks);
   }
 
-  function deleteTask(id: number) {
+  function deleteTask(id: number | string) {
     const newTodos = tasks.filter((task) => task.id != id);
     setTasks(newTodos);
   }
@@ -65,12 +77,7 @@ export function App() {
       <section>
         <h1 className="text-2xl font-bold">Task List</h1>
         <div>
-          <form onSubmit={(event) => addNewTask(event)} className="flex gap-2">
-            <Input name="task" type="text" placeholder="Add Your Task" />
-            <div>
-              <Button type="submit">Submit</Button>
-            </div>
-          </form>
+          <TaskForm addNewTask={addNewTask} />
         </div>
         <ul className="mt-4 space-y-2">
           {tasks.map((task) => (

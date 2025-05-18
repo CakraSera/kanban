@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { type Task } from "@/types/task";
+import { Edit, Trash2 } from "lucide-react";
 import {
   Card,
   CardTitle,
@@ -8,13 +9,16 @@ import {
   CardFooter,
 } from "./ui/card";
 import { Button } from "./ui/button";
+import { Label } from "./ui/label";
+import { Checkbox } from "./ui/checkbox";
 
 type TaskCardProps = {
   task: Task;
-  onEdit: (task: Task) => void;
+  onEdit: (titleTask: string, id: number) => void;
   onDelete: (taskId: number) => void;
 };
 export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -28,43 +32,71 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
       console.error("Please enter a task");
       return;
     }
-    const idTask = task.id;
+    const idTask = Number(task.id);
     onEdit(titleTask, idTask);
     setEdit(false);
     // setEdit(!edit);
     // onEdit(task);
   }
 
+  console.log("🚀 ~ TaskCard ~ isHovered:", isHovered);
   return (
-    <Card className="flex flex-row items-center justify-evenly p-4">
+    <Card
+      className="flex flex-row items-center justify-evenly p-4"
+      onMouseEnter={() => {
+        console.log("onMouseEnter");
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {!edit ? (
         <>
-          <CardTitle>{task?.title}</CardTitle>
-          <div className="flex gap-0.5">
-            <Button onClick={() => setEdit(true)}>Edit</Button>
-            <Button onClick={() => onDelete(task.id)}>Delete</Button>
-          </div>
           <CardHeader>
-            <CardTitle>{task.title}</CardTitle>
+            <div className="flex flex-col items-center gap-2">
+              <Checkbox id="task" />
+              <Label htmlFor="task">
+                <CardTitle>{task.title}</CardTitle>
+              </Label>
+            </div>
           </CardHeader>
           <CardContent>
             <p>{task.description}</p>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <div
-              className={`absolute top-2 right-2 flex gap-2 transition-opacity duration-300 ${
+            <Button variant="outline" size="icon" onClick={() => setEdit(true)}>
+              <Edit className="h-4 w-4" />
+              <span className="sr-only">Edit</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onDelete(Number(task.id))}
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="sr-only">Delete</span>
+            </Button>
+            {/* <div
+              className={`absolute top-2 right-2 flex gap-2 opacity-100 transition-opacity duration-300 ${
                 isHovered ? "opacity-100" : "opacity-0"
               }`}
             >
-              <Button variant="outline" size="icon" onClick={handleEdit}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setEdit(true)}
+              >
                 <Edit className="h-4 w-4" />
                 <span className="sr-only">Edit</span>
               </Button>
-              <Button variant="outline" size="icon" onClick={handleDelete}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => onDelete(Number(task.id))}
+              >
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Delete</span>
               </Button>
-            </div>
+            </div> */}
           </CardFooter>
         </>
       ) : (
