@@ -65,7 +65,7 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
           </CardContent>
           <CardFooter className="flex justify-between">
             <div
-              className={`absolute top-2 right-2 flex gap-2 opacity-100 transition-opacity duration-300 ${
+              className={`absolute top-2 right-2 flex gap-2 transition-opacity duration-300 ${
                 isHovered ? "opacity-100" : "opacity-0"
               }`}
             >
