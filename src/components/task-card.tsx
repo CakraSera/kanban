@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { type Task } from "@/types/task";
-import { Edit, Trash2 } from "lucide-react";
+import { type Task } from "@/types";
+import { Edit, Trash2, CalendarIcon, Clock } from "lucide-react";
 import {
   Card,
   CardTitle,
@@ -8,6 +8,7 @@ import {
   CardContent,
   CardFooter,
 } from "./ui/card";
+import { format } from "date-fns";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
@@ -22,7 +23,6 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   const [edit, setEdit] = useState<boolean>(false);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    console.log("🚀 ~ handleSubmit ~ event:", event);
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const titleTask: string | undefined = formData
@@ -39,22 +39,18 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
     // onEdit(task);
   }
 
-  console.log("🚀 ~ TaskCard ~ isHovered:", isHovered);
   return (
     <Card
       className="relative overflow-hidden transition-all duration-300"
       // className="flex flex-row items-center justify-evenly p-4 "
-      onMouseEnter={() => {
-        console.log("onMouseEnter");
-        setIsHovered(true);
-      }}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {!edit ? (
         <>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Checkbox id="task" />
+              <Checkbox id="task" checked={task.completed} />
               <Label htmlFor="task">
                 <CardTitle>{task.title}</CardTitle>
               </Label>
@@ -62,6 +58,17 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
           </CardHeader>
           <CardContent>
             <p>{task.description}</p>
+            <div className="mt-3 flex flex-col gap-1">
+              <div className="text-muted-foreground flex items-center text-xs">
+                <CalendarIcon className="mr-1 h-3 w-3" />
+                <span>Due: {format(task.createdAt, "PPP")}</span>
+              </div>
+
+              <div className="text-muted-foreground flex items-center text-xs">
+                <Clock className="mr-1 h-3 w-3" />
+                <span>Created: {format(task.createdAt, "PPP")}</span>
+              </div>
+            </div>
           </CardContent>
           <CardFooter className="flex justify-between">
             <div

@@ -1,55 +1,61 @@
-import { useState } from "react";
-import { nanoid } from "nanoid";
+import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
+import {
+  getItemLocalStorage,
+  setItemLocalStorage,
+} from "@/utils/local-storage";
+
 import { TaskCard } from "./components/task-card";
-import type { Task } from "./types/task";
-import { TaskForm } from "./components/task-form";
+import type { Task, Column } from "./types";
+import { TaskAddForm } from "./components/task-add-form";
+import { Button } from "./components/ui/button";
 
 export function App() {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: 1,
-      title: "Walk the dog",
-      description: "Take the dog for a walk in the park",
-      completed: false,
-      createdAt: new Date("2023-10-01"),
-    },
-    {
-      id: 2,
-      title: "Water the plants",
-      description: "Water the plants in the garden",
-      completed: false,
-      createdAt: new Date("2023-10-02"),
-    },
-    {
-      id: 3,
-      title: "Wash the dishes",
-      description: "Wash the dishes after dinner",
-      completed: false,
-      createdAt: new Date("2023-10-03"),
-    },
-  ]);
+  const [isOpenAddTask, setIsOpenAddTask] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const item = getItemLocalStorage("tasks");
+    return (
+      (item as Task[]) || [
+        {
+          id: 1,
+          title: "Walk the dog",
+          description: "Take the dog for a walk in the park",
+          status: "IN_PROGRESS",
+          completed: false,
+          createdAt: new Date("2023-10-01"),
+        },
+        {
+          id: 2,
+          title: "Water the plants",
+          description: "Water the plants in the garden",
+          status: "TODO",
+          completed: false,
+          createdAt: new Date("2023-10-02"),
+        },
+        {
+          id: 3,
+          title: "Wash the dishes",
+          description: "Wash the dishes after dinner",
+          status: "DONE",
+          completed: false,
+          createdAt: new Date("2023-10-03"),
+        },
+      ]
+    );
+  });
 
-  function addNewTask(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const task: string | undefined = formData.get("task")?.toString();
-    console.log("🚀 ~ addNewTask ~ task:", task);
-    if (!task) {
-      console.error("Please enter a task");
-      return;
-    }
-    const newId = nanoid();
-    console.log("🚀 ~ addNewTask ~ newId:", newId);
-    setTasks([
-      ...tasks,
-      {
-        id: newId,
-        title: task,
-        description: "",
-        completed: false,
-        createdAt: new Date(),
-      },
-    ]);
+  const COLOMNS: Column[] = [
+    { id: "TODO", name: "Todo" },
+    { id: "IN_PROGRESS", name: "In Progress" },
+    { id: "DONE", name: "Done" },
+  ];
+
+  useEffect(() => {
+    setItemLocalStorage("tasks", tasks);
+  }, [tasks]);
+
+  function addNewTask(task: Task) {
+    setTasks([...tasks, task]);
   }
 
   function editTask(titleTask: string, id: number | string) {
@@ -73,17 +79,43 @@ export function App() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
       <section>
-        <h1 className="text-2xl font-bold">Task List</h1>
-        <div>
-          <TaskForm addNewTask={addNewTask} />
+        <h1 className="text-center text-2xl font-extrabold">Kanban Board</h1>
+        <div className="flex justify-end">
+          <Button onClick={() => setIsOpenAddTask(true)} className="mt-4">
+            <Plus className="mr-2 h-5 w-5" />
+            <p>Add Task</p>
+          </Button>
         </div>
-        <ul className="mt-4 space-y-2">
-          {tasks.map((task) => (
-            <li key={task.id}>
-              <TaskCard task={task} onDelete={deleteTask} onEdit={editTask} />
-            </li>
-          ))}
-        </ul>
+        <div className="flex gap-2.5 pt-8">
+          {COLOMNS.map((column) => {
+            return (
+              <div
+                key={column.id}
+                className="flex flex-col items-center rounded-2xl border-2 p-2"
+              >
+                <h2 className="text-xl font-bold">{column.name}</h2>
+                <ul className="mt-4 space-y-2">
+                  {tasks
+                    .filter((task) => task.status === column.id)
+                    .map((task) => (
+                      <li key={task.id}>
+                        <TaskCard
+                          task={task}
+                          onDelete={deleteTask}
+                          onEdit={editTask}
+                        />
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+        <TaskAddForm
+          addNewTask={addNewTask}
+          isOpen={isOpenAddTask}
+          onClose={() => setIsOpenAddTask(false)}
+        />
       </section>
     </div>
   );
