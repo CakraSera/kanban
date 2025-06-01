@@ -5,9 +5,10 @@ export type Task = {
   status: string;
   completed: boolean;
   createdAt: Date;
+  dueDate: Date;
 };
 
 export type Column = {
-  id: string;
+  slug: string;
   name: string;
 };

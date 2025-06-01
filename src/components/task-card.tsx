@@ -16,9 +16,15 @@ import { Checkbox } from "./ui/checkbox";
 type TaskCardProps = {
   task: Task;
   onEdit: (titleTask: string, id: number) => void;
-  onDelete: (taskId: number) => void;
+  onDelete: (taskId: number | string) => void;
+  onToggleCompletion: (value: boolean, taskId: number | string) => void;
 };
-export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({
+  task,
+  onToggleCompletion,
+  onEdit,
+  onDelete,
+}: TaskCardProps) {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
 
@@ -41,7 +47,7 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
 
   return (
     <Card
-      className="relative overflow-hidden transition-all duration-300"
+      className={`relative overflow-hidden transition-all duration-300 ${task.completed ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""} `}
       // className="flex flex-row items-center justify-evenly p-4 "
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -50,7 +56,13 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
         <>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Checkbox id="task" checked={task.completed} />
+              <Checkbox
+                id="task"
+                checked={task.completed}
+                onCheckedChange={() =>
+                  onToggleCompletion(!task.completed, task.id)
+                }
+              />
               <Label htmlFor="task">
                 <CardTitle>{task.title}</CardTitle>
               </Label>
@@ -61,7 +73,7 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
             <div className="mt-3 flex flex-col gap-1">
               <div className="text-muted-foreground flex items-center text-xs">
                 <CalendarIcon className="mr-1 h-3 w-3" />
-                <span>Due: {format(task.createdAt, "PPP")}</span>
+                <span>Due: {format(task.dueDate, "PPP")}</span>
               </div>
 
               <div className="text-muted-foreground flex items-center text-xs">
@@ -87,7 +99,7 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => onDelete(Number(task.id))}
+                onClick={() => onDelete(task.id)}
               >
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Delete</span>

@@ -4,10 +4,10 @@ import {
   getItemLocalStorage,
   setItemLocalStorage,
 } from "@/utils/local-storage";
-
+import { DndContext, DragEndEvent, useDroppable } from "@dnd-kit/core";
 import { TaskCard } from "./components/task-card";
 import type { Task, Column } from "./types";
-import { TaskAddForm } from "./components/task-add-form";
+import { TaskForm } from "./components/task-add-form";
 import { Button } from "./components/ui/button";
 
 export function App() {
@@ -23,6 +23,7 @@ export function App() {
           status: "IN_PROGRESS",
           completed: false,
           createdAt: new Date("2023-10-01"),
+          dueDate: new Date("2023-10-01"),
         },
         {
           id: 2,
@@ -31,6 +32,7 @@ export function App() {
           status: "TODO",
           completed: false,
           createdAt: new Date("2023-10-02"),
+          dueDate: new Date("2023-10-02"),
         },
         {
           id: 3,
@@ -39,15 +41,16 @@ export function App() {
           status: "DONE",
           completed: false,
           createdAt: new Date("2023-10-03"),
+          dueDate: new Date("2023-10-03"),
         },
       ]
     );
   });
 
-  const COLOMNS: Column[] = [
-    { id: "TODO", name: "Todo" },
-    { id: "IN_PROGRESS", name: "In Progress" },
-    { id: "DONE", name: "Done" },
+  const columns: Column[] = [
+    { slug: "TODO", name: "Todo" },
+    { slug: "IN_PROGRESS", name: "In Progress" },
+    { slug: "DONE", name: "Done" },
   ];
 
   useEffect(() => {
@@ -58,10 +61,13 @@ export function App() {
     setTasks([...tasks, task]);
   }
 
+  function handleDragEnd(event: DragEndEvent) {
+    console.log(event);
+  }
+
   function editTask(titleTask: string, id: number | string) {
-    console.log("🚀 ~ editTask ~ id:", id);
-    console.log("🚀 ~ editTask ~ titleTask:", titleTask);
     const taskToEdit = tasks.find((task) => task.id === id);
+
     if (!taskToEdit) {
       console.error("Task not found");
       return;
@@ -76,8 +82,17 @@ export function App() {
     setTasks(newTodos);
   }
 
+  function changeTaskCompletion(value: boolean, taskId: number | string) {
+    console.log("🚀 ~ onClickTask ~ taskId:", taskId);
+    console.log(value);
+    const newTasks = tasks.map((task) =>
+      task.id === taskId ? { ...task, completed: value } : task,
+    );
+    setTasks(newTasks);
+  }
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <section>
         <h1 className="text-center text-2xl font-extrabold">Kanban Board</h1>
         <div className="flex justify-end">
@@ -86,32 +101,46 @@ export function App() {
             <p>Add Task</p>
           </Button>
         </div>
-        <div className="flex gap-2.5 pt-8">
-          {COLOMNS.map((column) => {
-            return (
-              <div
-                key={column.id}
-                className="flex flex-col items-center rounded-2xl border-2 p-2"
-              >
-                <h2 className="text-xl font-bold">{column.name}</h2>
-                <ul className="mt-4 space-y-2">
-                  {tasks
-                    .filter((task) => task.status === column.id)
-                    .map((task) => (
-                      <li key={task.id}>
-                        <TaskCard
-                          task={task}
-                          onDelete={deleteTask}
-                          onEdit={editTask}
-                        />
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-3 gap-2.5 pt-8">
+          <DndContext onDragEnd={handleDragEnd}>
+            {columns.map((column) => {
+              const tasksInColumn = tasks.filter(
+                (task) => task.status === column.slug,
+              );
+
+              useDroppable({
+                id: column.slug,
+              });
+              return (
+                <div
+                  key={column.slug}
+                  className="flex flex-col items-center rounded-2xl border-2 p-2"
+                >
+                  <h2 className="text-xl font-bold">{column.name}</h2>
+                  <ul className="mt-4 h-full space-y-2">
+                    {tasksInColumn.length == 0 ? (
+                      <div className="flex h-full items-center justify-center">
+                        <h3 className="font-bold">No Tasks</h3>
+                      </div>
+                    ) : (
+                      tasksInColumn.map((task) => (
+                        <li key={task.id}>
+                          <TaskCard
+                            task={task}
+                            onDelete={deleteTask}
+                            onEdit={editTask}
+                            onToggleCompletion={changeTaskCompletion}
+                          />
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              );
+            })}
+          </DndContext>
         </div>
-        <TaskAddForm
+        <TaskForm
           addNewTask={addNewTask}
           isOpen={isOpenAddTask}
           onClose={() => setIsOpenAddTask(false)}

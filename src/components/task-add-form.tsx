@@ -2,63 +2,74 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { nanoid } from "nanoid";
-import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectTrigger,
   SelectValue,
   SelectItem,
-} from "./ui/select";
+} from "@/components/ui/select";
 import type { Task } from "@/types";
+import { DatePicker } from "@/components/ui/date-picker";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { date, z } from "zod";
 type addNewTaskProps = {
   addNewTask: (task: Task) => void;
   isOpen: boolean;
   onClose: () => void;
 };
 
-export function TaskAddForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
+const taskFormSchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  description: z.string().min(1, { message: "Description is required" }),
+  status: z.enum(["TODO", "IN_PROGRESS", "DONE"]),
+  dueDate: z.date(),
+});
+
+export function TaskForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
   const [status, setStatus] = useState<string>("TODO");
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const titleTask: string | undefined = formData.get("title")?.toString();
-    const descriptionTask: string | undefined = formData
-      .get("description")
-      ?.toString();
-    if (!titleTask) {
-      console.error("Please enter a task");
-      return;
-    }
-    const newId = nanoid();
+  const form = useForm<z.infer<typeof taskFormSchema>>({
+    resolver: zodResolver(taskFormSchema),
+    defaultValues: {
+      dueDate: new Date(),
+      status: "TODO",
+      title: "",
+      description: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof taskFormSchema>) {
+    console.log(values);
     const task = {
-      id: newId,
-      title: titleTask,
-      description: descriptionTask,
+      id: nanoid(),
+      title: values.title,
+      description: values.description,
       status: status,
       completed: false,
       createdAt: new Date(),
+      dueDate: values.dueDate,
     };
+    console.log("🚀 ~ onSubmit ~ task:", task);
     addNewTask(task);
-    resetForm(event);
+    form.reset();
     onClose();
-  }
-
-  function resetForm(event: React.FormEvent<HTMLFormElement>) {
-    const formData = new FormData(event.currentTarget);
-    formData.set("title", "");
-    formData.set("description", "");
-    setStatus("TODO");
   }
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
-        console.log("🚀 ~ TaskAddForm ~ open:", open);
         if (!open) {
           onClose();
         }
@@ -66,38 +77,89 @@ export function TaskAddForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
     >
       <DialogContent className="sm:max-w-[425px]">
         <DialogTitle className="pb-4">Add New Task</DialogTitle>
-        <form
-          onSubmit={(event) => handleSubmit(event)}
-          className="flex flex-col gap-4"
-        >
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="title">Task Title</Label>
-            <Input name="title" type="text" placeholder="Add Your Task Title" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="description">Task Description</Label>
-            <Textarea
-              name="description"
-              placeholder="Add Your Task Description"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
+          >
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <div className="flex flex-col gap-2">
+                  <FormLabel htmlFor="title">Task Title</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Add Your Task Title"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </div>
+              )}
             />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="status">Status</Label>
-            <Select value={status} onValueChange={(value) => setStatus(value)}>
-              <SelectTrigger className="w-full" id="status">
-                <SelectValue placeholder="Select a status" />
-              </SelectTrigger>
-              <SelectContent className="w-full">
-                <SelectItem value="TODO">Todo</SelectItem>
-                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                <SelectItem value="DONE">Done</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Button type="submit">Submit</Button>
-          </div>
-        </form>
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <div className="flex flex-col gap-2">
+                  <FormLabel htmlFor="description">Task Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Add Your Task Description"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </div>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <div className="flex flex-col gap-2">
+                  <FormLabel htmlFor="status">Status</FormLabel>
+                  <Select
+                    value={status}
+                    onValueChange={(value) => setStatus(value)}
+                  >
+                    <SelectTrigger className="w-full" id="status">
+                      <SelectValue placeholder="Select a status" />
+                    </SelectTrigger>
+                    <SelectContent className="w-full">
+                      <SelectItem value="TODO">Todo</SelectItem>
+                      <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                      <SelectItem value="DONE">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="dueDate"
+              render={({ field }) => (
+                <div className="flex flex-col gap-2">
+                  <FormLabel htmlFor="dueDate">Due Date</FormLabel>
+                  <FormControl>
+                    <DatePicker
+                      onValueChange={(value) => field.onChange(value)}
+                      date={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </div>
+              )}
+            />
+            <div>
+              <Button type="submit">Submit</Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
