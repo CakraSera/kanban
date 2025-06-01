@@ -4,7 +4,7 @@ import {
   getItemLocalStorage,
   setItemLocalStorage,
 } from "@/utils/local-storage";
-import { DndContext, DragEndEvent, useDroppable } from "@dnd-kit/core";
+import { DndContext, type DragEndEvent, useDroppable } from "@dnd-kit/core";
 import { TaskCard } from "./components/task-card";
 import type { Task, Column } from "./types";
 import { TaskForm } from "./components/task-add-form";
@@ -134,7 +134,9 @@ export function App() {
   function handleDragEnd(event: DragEndEvent) {
     console.log(event);
     const { active, over } = event;
+
     if (!over) return;
+
     const taskId = active.id as string;
     const newStatus = over.id as Task["status"];
 
