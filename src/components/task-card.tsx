@@ -89,7 +89,7 @@ export function TaskCard({
               <div className="text-muted-foreground flex items-center text-xs">
                 <CalendarIcon className="mr-1 h-3 w-3" />
                 <span>
-                  Due:{" "}
+                  Due:
                   {isValid(task.dueDate)
                     ? format(task.dueDate, "PPP")
                     : "No due date"}
@@ -99,7 +99,7 @@ export function TaskCard({
               <div className="text-muted-foreground flex items-center text-xs">
                 <Clock className="mr-1 h-3 w-3" />
                 <span>
-                  Created:{" "}
+                  Created:
                   {isValid(task.createdAt)
                     ? format(task.createdAt, "PPP")
                     : "Invalid date"}

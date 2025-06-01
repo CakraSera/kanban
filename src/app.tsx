@@ -7,62 +7,15 @@ import {
 import {
   DndContext,
   type DragEndEvent,
-  useDroppable,
   MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { TaskCard } from "./components/task-card";
 import type { Task, Column } from "./types";
 import { TaskForm } from "./components/task-add-form";
 import { Button } from "./components/ui/button";
-
-function KanbanColumn({
-  column,
-  tasks,
-  onDelete,
-  onEdit,
-  onToggleCompletion,
-}: {
-  column: Column;
-  tasks: Task[];
-  onDelete: (id: number | string) => void;
-  onEdit: (title: string, id: number | string) => void;
-  onToggleCompletion: (value: boolean, taskId: number | string) => void;
-}) {
-  const { setNodeRef } = useDroppable({
-    id: column.slug,
-  });
-  const tasksInColumn = tasks.filter((task) => task.status === column.slug);
-
-  return (
-    <div
-      ref={setNodeRef}
-      className="flex flex-col items-center rounded-2xl border-2 p-2"
-    >
-      <h2 className="text-xl font-bold">{column.name}</h2>
-      <ul className="mt-4 h-full space-y-2">
-        {tasksInColumn.length == 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <h3 className="font-bold">No Tasks</h3>
-          </div>
-        ) : (
-          tasksInColumn.map((task) => (
-            <li key={task.id}>
-              <TaskCard
-                task={task}
-                onDelete={onDelete}
-                onEdit={onEdit}
-                onToggleCompletion={onToggleCompletion}
-              />
-            </li>
-          ))
-        )}
-      </ul>
-    </div>
-  );
-}
+import { TaskColumn } from "./components/task-colomn";
 
 export function App() {
   const [isOpenAddTask, setIsOpenAddTask] = useState(false);
@@ -180,7 +133,7 @@ export function App() {
         <div className="grid grid-cols-3 gap-2.5 pt-8">
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             {columns.map((column) => (
-              <KanbanColumn
+              <TaskColumn
                 key={column.slug}
                 column={column}
                 tasks={tasks}
