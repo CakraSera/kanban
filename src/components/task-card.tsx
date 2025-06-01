@@ -32,6 +32,8 @@ export function TaskCard({
     id: task.id,
   });
 
+  console.log({ createdAt: isValid(task.dueDate) });
+
   const style = transform
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
@@ -90,9 +92,7 @@ export function TaskCard({
                 <CalendarIcon className="mr-1 h-3 w-3" />
                 <span>
                   Due:
-                  {isValid(task.dueDate)
-                    ? format(task.dueDate, "PPP")
-                    : "No due date"}
+                  {format(task.dueDate, "PPP")}
                 </span>
               </div>
 
@@ -100,9 +100,7 @@ export function TaskCard({
                 <Clock className="mr-1 h-3 w-3" />
                 <span>
                   Created:
-                  {isValid(task.createdAt)
-                    ? format(task.createdAt, "PPP")
-                    : "Invalid date"}
+                  {format(task.createdAt, "PPP")}
                 </span>
               </div>
             </div>

@@ -12,6 +12,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { Tasks } from "@/data/index";
 import type { Task, Column } from "./types";
 import { TaskForm } from "./components/task-add-form";
 import { Button } from "./components/ui/button";
@@ -33,38 +34,8 @@ export function App() {
     }),
   );
   const [tasks, setTasks] = useState<Task[]>(() => {
-    const item = getItemLocalStorage("tasks");
-    return (
-      (item as Task[]) || [
-        {
-          id: 1,
-          title: "Walk the dog",
-          description: "Take the dog for a walk in the park",
-          status: "IN_PROGRESS",
-          completed: false,
-          createdAt: new Date("2023-10-01"),
-          dueDate: new Date("2023-10-01"),
-        },
-        {
-          id: 2,
-          title: "Water the plants",
-          description: "Water the plants in the garden",
-          status: "TODO",
-          completed: false,
-          createdAt: new Date("2023-10-02"),
-          dueDate: new Date("2023-10-02"),
-        },
-        {
-          id: 3,
-          title: "Wash the dishes",
-          description: "Wash the dishes after dinner",
-          status: "DONE",
-          completed: false,
-          createdAt: new Date("2023-10-03"),
-          dueDate: new Date("2023-10-03"),
-        },
-      ]
-    );
+    const tasksLocalStorage = getItemLocalStorage("tasks");
+    return (tasksLocalStorage as Task[]) || Tasks;
   });
 
   const columns: Column[] = [
