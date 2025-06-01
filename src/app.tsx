@@ -4,7 +4,15 @@ import {
   getItemLocalStorage,
   setItemLocalStorage,
 } from "@/utils/local-storage";
-import { DndContext, type DragEndEvent, useDroppable } from "@dnd-kit/core";
+import {
+  DndContext,
+  type DragEndEvent,
+  useDroppable,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { TaskCard } from "./components/task-card";
 import type { Task, Column } from "./types";
 import { TaskForm } from "./components/task-add-form";
@@ -58,6 +66,19 @@ function KanbanColumn({
 
 export function App() {
   const [isOpenAddTask, setIsOpenAddTask] = useState(false);
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 100,
+        tolerance: 5,
+      },
+    }),
+  );
   const [tasks, setTasks] = useState<Task[]>(() => {
     const item = getItemLocalStorage("tasks");
     return (
@@ -157,7 +178,7 @@ export function App() {
           </Button>
         </div>
         <div className="grid grid-cols-3 gap-2.5 pt-8">
-          <DndContext onDragEnd={handleDragEnd}>
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             {columns.map((column) => (
               <KanbanColumn
                 key={column.slug}

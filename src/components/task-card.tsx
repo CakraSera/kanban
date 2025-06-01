@@ -32,11 +32,12 @@ export function TaskCard({
     id: task.id,
   });
 
-  const style = !transform
-    ? undefined
-    : {
-        transform: `translate(${transform.x}px, ${transform.y}px)`,
-      };
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        transition: "transform 0.2s ease",
+      }
+    : undefined;
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,7 +62,7 @@ export function TaskCard({
       {...listeners}
       {...attributes}
       style={style}
-      className={`relative overflow-hidden transition-all duration-300 ${task.completed ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""} `}
+      className={`relative overflow-hidden transition-all duration-300 ${task.completed ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""} touch-none`}
       // className="flex flex-row items-center justify-evenly p-4 "
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
