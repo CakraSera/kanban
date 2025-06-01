@@ -12,6 +12,9 @@ import { Button } from "./components/ui/button";
 
 export function App() {
   const [isOpenAddTask, setIsOpenAddTask] = useState(false);
+  const todoDroppable = useDroppable({ id: "TODO" });
+  const inProgressDroppable = useDroppable({ id: "IN_PROGRESS" });
+  const doneDroppable = useDroppable({ id: "DONE" });
   const [tasks, setTasks] = useState<Task[]>(() => {
     const item = getItemLocalStorage("tasks");
     return (
@@ -61,10 +64,6 @@ export function App() {
     setTasks([...tasks, task]);
   }
 
-  function handleDragEnd(event: DragEndEvent) {
-    console.log(event);
-  }
-
   function editTask(titleTask: string, id: number | string) {
     const taskToEdit = tasks.find((task) => task.id === id);
 
@@ -83,12 +82,24 @@ export function App() {
   }
 
   function changeTaskCompletion(value: boolean, taskId: number | string) {
-    console.log("🚀 ~ onClickTask ~ taskId:", taskId);
-    console.log(value);
     const newTasks = tasks.map((task) =>
       task.id === taskId ? { ...task, completed: value } : task,
     );
     setTasks(newTasks);
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    console.log(event);
+    const { active, over } = event;
+    if (!over) return;
+    const taskId = active.id as string;
+    const newStatus = over.id as Task["status"];
+
+    setTasks(() =>
+      tasks.map((task) =>
+        task.id !== taskId ? task : { ...task, status: newStatus },
+      ),
+    );
   }
 
   return (
@@ -107,13 +118,16 @@ export function App() {
               const tasksInColumn = tasks.filter(
                 (task) => task.status === column.slug,
               );
-
-              useDroppable({
-                id: column.slug,
-              });
+              const droppableRef =
+                column.slug === "TODO"
+                  ? todoDroppable.setNodeRef
+                  : column.slug === "IN_PROGRESS"
+                    ? inProgressDroppable.setNodeRef
+                    : doneDroppable.setNodeRef;
               return (
                 <div
                   key={column.slug}
+                  ref={droppableRef}
                   className="flex flex-col items-center rounded-2xl border-2 p-2"
                 >
                   <h2 className="text-xl font-bold">{column.name}</h2>

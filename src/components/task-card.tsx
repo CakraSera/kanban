@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
+import { useDraggable } from "@dnd-kit/core";
 
 type TaskCardProps = {
   task: Task;
@@ -27,6 +28,15 @@ export function TaskCard({
 }: TaskCardProps) {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: task.id,
+  });
+
+  const style = !transform
+    ? undefined
+    : {
+        transform: `translate(${transform.x}px, ${transform.y}px)`,
+      };
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -47,6 +57,10 @@ export function TaskCard({
 
   return (
     <Card
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      style={style}
       className={`relative overflow-hidden transition-all duration-300 ${task.completed ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""} `}
       // className="flex flex-row items-center justify-evenly p-4 "
       onMouseEnter={() => setIsHovered(true)}
