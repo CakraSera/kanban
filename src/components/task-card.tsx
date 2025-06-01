@@ -90,17 +90,13 @@ export function TaskCard({
             <div className="mt-3 flex flex-col gap-1">
               <div className="text-muted-foreground flex items-center text-xs">
                 <CalendarIcon className="mr-1 h-3 w-3" />
-                <span>
-                  Due:
-                  {format(task.dueDate, "PPP")}
-                </span>
+                <span>Due: {format(new Date(task.dueDate), "PPP 'at' p")}</span>
               </div>
 
               <div className="text-muted-foreground flex items-center text-xs">
                 <Clock className="mr-1 h-3 w-3" />
                 <span>
-                  Created:
-                  {format(task.createdAt, "PPP")}
+                  Created: {format(new Date(task.createdAt), "PPP 'at' p")}
                 </span>
               </div>
             </div>
