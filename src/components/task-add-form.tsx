@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { date, z } from "zod";
+import { z } from "zod";
 type addNewTaskProps = {
   addNewTask: (task: Task) => void;
   isOpen: boolean;
@@ -120,7 +120,7 @@ export function TaskForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
             <FormField
               control={form.control}
               name="status"
-              render={({ field }) => (
+              render={() => (
                 <div className="flex flex-col gap-2">
                   <FormLabel htmlFor="status">Status</FormLabel>
                   <Select
