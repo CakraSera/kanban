@@ -50,7 +50,6 @@ export function TaskForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
   });
 
   function onSubmit(values: z.infer<typeof taskFormSchema>) {
-    console.log(values);
     const task = {
       id: nanoid(),
       title: values.title,
@@ -60,7 +59,6 @@ export function TaskForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
       createdAt: new Date(),
       dueDate: values.dueDate,
     };
-    console.log("🚀 ~ onSubmit ~ task:", task);
     addNewTask(task);
     form.reset();
     onClose();

@@ -132,7 +132,6 @@ export function App() {
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    console.log(event);
     const { active, over } = event;
 
     if (!over) return;
