@@ -10,11 +10,54 @@ import type { Task, Column } from "./types";
 import { TaskForm } from "./components/task-add-form";
 import { Button } from "./components/ui/button";
 
+function KanbanColumn({
+  column,
+  tasks,
+  onDelete,
+  onEdit,
+  onToggleCompletion,
+}: {
+  column: Column;
+  tasks: Task[];
+  onDelete: (id: number | string) => void;
+  onEdit: (title: string, id: number | string) => void;
+  onToggleCompletion: (value: boolean, taskId: number | string) => void;
+}) {
+  const { setNodeRef } = useDroppable({
+    id: column.slug,
+  });
+  const tasksInColumn = tasks.filter((task) => task.status === column.slug);
+
+  return (
+    <div
+      ref={setNodeRef}
+      className="flex flex-col items-center rounded-2xl border-2 p-2"
+    >
+      <h2 className="text-xl font-bold">{column.name}</h2>
+      <ul className="mt-4 h-full space-y-2">
+        {tasksInColumn.length == 0 ? (
+          <div className="flex h-full items-center justify-center">
+            <h3 className="font-bold">No Tasks</h3>
+          </div>
+        ) : (
+          tasksInColumn.map((task) => (
+            <li key={task.id}>
+              <TaskCard
+                task={task}
+                onDelete={onDelete}
+                onEdit={onEdit}
+                onToggleCompletion={onToggleCompletion}
+              />
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
+  );
+}
+
 export function App() {
   const [isOpenAddTask, setIsOpenAddTask] = useState(false);
-  const todoDroppable = useDroppable({ id: "TODO" });
-  const inProgressDroppable = useDroppable({ id: "IN_PROGRESS" });
-  const doneDroppable = useDroppable({ id: "DONE" });
   const [tasks, setTasks] = useState<Task[]>(() => {
     const item = getItemLocalStorage("tasks");
     return (
@@ -114,44 +157,16 @@ export function App() {
         </div>
         <div className="grid grid-cols-3 gap-2.5 pt-8">
           <DndContext onDragEnd={handleDragEnd}>
-            {columns.map((column) => {
-              const tasksInColumn = tasks.filter(
-                (task) => task.status === column.slug,
-              );
-              const droppableRef =
-                column.slug === "TODO"
-                  ? todoDroppable.setNodeRef
-                  : column.slug === "IN_PROGRESS"
-                    ? inProgressDroppable.setNodeRef
-                    : doneDroppable.setNodeRef;
-              return (
-                <div
-                  key={column.slug}
-                  ref={droppableRef}
-                  className="flex flex-col items-center rounded-2xl border-2 p-2"
-                >
-                  <h2 className="text-xl font-bold">{column.name}</h2>
-                  <ul className="mt-4 h-full space-y-2">
-                    {tasksInColumn.length == 0 ? (
-                      <div className="flex h-full items-center justify-center">
-                        <h3 className="font-bold">No Tasks</h3>
-                      </div>
-                    ) : (
-                      tasksInColumn.map((task) => (
-                        <li key={task.id}>
-                          <TaskCard
-                            task={task}
-                            onDelete={deleteTask}
-                            onEdit={editTask}
-                            onToggleCompletion={changeTaskCompletion}
-                          />
-                        </li>
-                      ))
-                    )}
-                  </ul>
-                </div>
-              );
-            })}
+            {columns.map((column) => (
+              <KanbanColumn
+                key={column.slug}
+                column={column}
+                tasks={tasks}
+                onDelete={deleteTask}
+                onEdit={editTask}
+                onToggleCompletion={changeTaskCompletion}
+              />
+            ))}
           </DndContext>
         </div>
         <TaskForm
