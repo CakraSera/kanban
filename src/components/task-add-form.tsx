@@ -57,7 +57,10 @@ export function TaskForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
       status: status,
       completed: false,
       createdAt: new Date(),
-      dueDate: values.dueDate,
+      dueDate:
+        values.dueDate instanceof Date
+          ? values.dueDate
+          : new Date(values.dueDate),
     };
     addNewTask(task);
     form.reset();

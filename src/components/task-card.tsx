@@ -8,7 +8,7 @@ import {
   CardContent,
   CardFooter,
 } from "./ui/card";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
@@ -88,12 +88,22 @@ export function TaskCard({
             <div className="mt-3 flex flex-col gap-1">
               <div className="text-muted-foreground flex items-center text-xs">
                 <CalendarIcon className="mr-1 h-3 w-3" />
-                <span>Due: {format(task.dueDate, "PPP")}</span>
+                <span>
+                  Due:{" "}
+                  {isValid(task.dueDate)
+                    ? format(task.dueDate, "PPP")
+                    : "No due date"}
+                </span>
               </div>
 
               <div className="text-muted-foreground flex items-center text-xs">
                 <Clock className="mr-1 h-3 w-3" />
-                <span>Created: {format(task.createdAt, "PPP")}</span>
+                <span>
+                  Created:{" "}
+                  {isValid(task.createdAt)
+                    ? format(task.createdAt, "PPP")
+                    : "Invalid date"}
+                </span>
               </div>
             </div>
           </CardContent>
