@@ -32,8 +32,6 @@ export function TaskCard({
     id: task.id,
   });
 
-  console.log({ createdAt: isValid(task.dueDate) });
-
   const style = transform
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
@@ -64,7 +62,7 @@ export function TaskCard({
       {...listeners}
       {...attributes}
       style={style}
-      className={`relative overflow-hidden transition-all duration-300 ${task.completed ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""} touch-none`}
+      className={`relative min-w-md overflow-hidden transition-all duration-300 ${task.completed ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""} touch-none`}
       // className="flex flex-row items-center justify-evenly p-4 "
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
