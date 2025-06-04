@@ -69,7 +69,7 @@ export function App() {
     setTasks(newTodos);
   }
 
-  function changeTaskCompletion(value: boolean, taskId: number | string) {
+  function toggleTaskCompletion(value: boolean, taskId: number | string) {
     const newTasks = tasks.map((task) =>
       task.id === taskId ? { ...task, completed: value } : task,
     );
@@ -110,7 +110,7 @@ export function App() {
                 tasks={tasks}
                 onDelete={deleteTask}
                 onEdit={editTask}
-                onToggleCompletion={changeTaskCompletion}
+                onToggleCompletion={toggleTaskCompletion}
               />
             ))}
           </DndContext>
