@@ -25,10 +25,10 @@ export function TaskColumn({
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col items-center rounded-2xl border-2 p-2"
+      className="flex min-h-72 flex-col items-center rounded-2xl border-2 p-2 md:w-full"
     >
       <h2 className="text-xl font-bold">{column.name}</h2>
-      <ul className="mt-4 h-full space-y-2">
+      <ul className="mt-4 h-full w-full space-y-2 px-2">
         {tasksInColumn.length == 0 ? (
           <div className="flex h-full items-center justify-center">
             <h3 className="font-bold">No Tasks</h3>

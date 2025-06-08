@@ -9,6 +9,6 @@ export type Task = {
 };
 
 export type Column = {
-  slug: string;
+  slug: "TODO" | "IN_PROGRESS" | "DONE";
   name: string;
 };

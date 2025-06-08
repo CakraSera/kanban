@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
 import {
   getItemLocalStorage,
   setItemLocalStorage,
@@ -15,11 +14,9 @@ import {
 import { Tasks } from "@/data/index";
 import type { Task, Column } from "./types";
 import { TaskForm } from "./components/task-add-form";
-import { Button } from "./components/ui/button";
 import { TaskColumn } from "./components/task-colomn";
 
 export function App() {
-  const [isOpenAddTask, setIsOpenAddTask] = useState(false);
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
@@ -54,7 +51,6 @@ export function App() {
 
   function editTask(titleTask: string, id: number | string) {
     const taskToEdit = tasks.find((task) => task.id === id);
-
     if (!taskToEdit) {
       console.error("Task not found");
       return;
@@ -71,7 +67,7 @@ export function App() {
 
   function toggleTaskCompletion(value: boolean, taskId: number | string) {
     const newTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, completed: value } : task,
+      task.id === taskId ? { ...task, completed: value, status: "DONE" } : task,
     );
     setTasks(newTasks);
   }
@@ -92,16 +88,15 @@ export function App() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
+    <div className="container mx-auto px-2 py-4 sm:px-4">
       <section>
-        <h1 className="text-center text-2xl font-extrabold">Kanban Board</h1>
+        <h1 className="mb-4 text-center text-2xl font-bold sm:mb-8 sm:text-3xl">
+          Kanban Board
+        </h1>
         <div className="flex justify-end">
-          <Button onClick={() => setIsOpenAddTask(true)} className="mt-4">
-            <Plus className="mr-2 h-5 w-5" />
-            <p>Add Task</p>
-          </Button>
+          <TaskForm addNewTask={addNewTask} />
         </div>
-        <div className="grid grid-cols-3 gap-2.5 pt-8">
+        <div className="flex flex-col gap-2.5 pt-8 md:flex-row">
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             {columns.map((column) => (
               <TaskColumn
@@ -115,11 +110,6 @@ export function App() {
             ))}
           </DndContext>
         </div>
-        <TaskForm
-          addNewTask={addNewTask}
-          isOpen={isOpenAddTask}
-          onClose={() => setIsOpenAddTask(false)}
-        />
       </section>
     </div>
   );

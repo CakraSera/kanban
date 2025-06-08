@@ -2,7 +2,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { nanoid } from "nanoid";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -25,8 +33,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 type addNewTaskProps = {
   addNewTask: (task: Task) => void;
-  isOpen: boolean;
-  onClose: () => void;
 };
 
 const taskFormSchema = z.object({
@@ -36,7 +42,8 @@ const taskFormSchema = z.object({
   dueDate: z.date(),
 });
 
-export function TaskForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
+export function TaskForm({ addNewTask }: addNewTaskProps) {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [status, setStatus] = useState<string>("TODO");
 
   const form = useForm<z.infer<typeof taskFormSchema>>({
@@ -63,19 +70,25 @@ export function TaskForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
           : new Date(values.dueDate),
     };
     addNewTask(task);
-    form.reset();
-    onClose();
+    setIsOpen(false);
   }
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
+        setIsOpen(open);
         if (!open) {
-          onClose();
+          form.reset();
         }
       }}
     >
+      <DialogTrigger>
+        <Button className="mt-4">
+          <Plus className="mr-2 h-5 w-5" />
+          <p>Add Task</p>
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogTitle className="pb-4">Add New Task</DialogTitle>
         <Form {...form}>
@@ -156,9 +169,12 @@ export function TaskForm({ addNewTask, isOpen, onClose }: addNewTaskProps) {
                 </div>
               )}
             />
-            <div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
               <Button type="submit">Submit</Button>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

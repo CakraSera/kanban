@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { type Task } from "@/types";
-import { Edit, Trash2, CalendarIcon, Clock } from "lucide-react";
+import { Edit, Trash2, CalendarIcon, Clock, View } from "lucide-react";
+import { Link } from "react-router";
 import {
   Card,
   CardTitle,
@@ -8,18 +9,20 @@ import {
   CardContent,
   CardFooter,
 } from "./ui/card";
-import { format, isValid } from "date-fns";
+import { format } from "date-fns";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { useDraggable } from "@dnd-kit/core";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 type TaskCardProps = {
   task: Task;
-  onEdit: (titleTask: string, id: number) => void;
+  onEdit: (titleTask: string, id: number | string) => void;
   onDelete: (taskId: number | string) => void;
   onToggleCompletion: (value: boolean, taskId: number | string) => void;
 };
+
 export function TaskCard({
   task,
   onToggleCompletion,
@@ -49,11 +52,8 @@ export function TaskCard({
       console.error("Please enter a task");
       return;
     }
-    const idTask = Number(task.id);
-    onEdit(titleTask, idTask);
+    onEdit(titleTask, task.id);
     setEdit(false);
-    // setEdit(!edit);
-    // onEdit(task);
   }
 
   return (
@@ -63,7 +63,6 @@ export function TaskCard({
       {...attributes}
       style={style}
       className={`relative min-w-md overflow-hidden transition-all duration-300 ${task.completed ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""} touch-none`}
-      // className="flex flex-row items-center justify-evenly p-4 "
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -105,27 +104,50 @@ export function TaskCard({
                 isHovered ? "opacity-100" : "opacity-0"
               }`}
             >
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setEdit(true)}
-              >
-                <Edit className="h-4 w-4" />
-                <span className="sr-only">Edit</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => onDelete(task.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-                <span className="sr-only">Delete</span>
-              </Button>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button asChild variant="outline">
+                    <Link to={`/task/${task.id}`}>
+                      <View />
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>View</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setEdit(true)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Edit</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Edit</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => onDelete(task.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Delete</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Delete</TooltipContent>
+              </Tooltip>
             </div>
           </CardFooter>
         </>
       ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+        <form
+          onSubmit={(event) => handleSubmit(event)}
+          className="flex flex-col gap-2"
+        >
           <input
             type="text"
             name="title-task"
