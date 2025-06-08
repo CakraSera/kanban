@@ -62,7 +62,7 @@ export function TaskCard({
       {...listeners}
       {...attributes}
       style={style}
-      className={`relative min-w-md overflow-hidden transition-all duration-300 ${task.completed ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""} touch-none`}
+      className={`relative overflow-hidden transition-all duration-300 ${task.completed ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""} touch-none`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

@@ -93,10 +93,10 @@ export function App() {
         <h1 className="mb-4 text-center text-2xl font-bold sm:mb-8 sm:text-3xl">
           Kanban Board
         </h1>
-        <div className="flex justify-end">
+        <div className="flex justify-end pb-4">
           <TaskForm addNewTask={addNewTask} />
         </div>
-        <div className="flex flex-col gap-2.5 pt-8 md:flex-row">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             {columns.map((column) => (
               <TaskColumn
