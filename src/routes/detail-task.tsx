@@ -2,79 +2,17 @@ import { Link, useParams } from "react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Trash2, User, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Calendar } from "lucide-react";
+import { format } from "date-fns";
+import { getItemLocalStorage } from "@/utils/local-storage";
 import { Separator } from "@/components/ui/separator";
 
-// Mock data - in a real app, this would come from your data store
-const taskData = {
-  "1": {
-    id: "1",
-    title: "Design landing page",
-    description:
-      "Create wireframes and mockups for the new landing page. This includes user research, competitor analysis, and creating high-fidelity designs that align with our brand guidelines.",
-    priority: "high",
-    assignee: "Sarah",
-    tags: ["design", "ui/ux"],
-    status: "To Do",
-    createdAt: "2024-01-15",
-    dueDate: "2024-01-25",
-    comments: [
-      {
-        id: 1,
-        author: "Mike",
-        content: "Looking forward to seeing the designs!",
-        timestamp: "2024-01-16",
-      },
-      {
-        id: 2,
-        author: "Sarah",
-        content: "I'll have the wireframes ready by tomorrow.",
-        timestamp: "2024-01-16",
-      },
-    ],
-  },
-  "2": {
-    id: "2",
-    title: "Set up database",
-    description: "Configure PostgreSQL database with initial schema",
-    priority: "medium",
-    assignee: "Mike",
-    tags: ["backend", "database"],
-    status: "To Do",
-    createdAt: "2024-01-14",
-    dueDate: "2024-01-20",
-    comments: [],
-  },
-  "3": {
-    id: "3",
-    title: "Implement authentication",
-    description: "Add user login and registration functionality",
-    priority: "high",
-    assignee: "Alex",
-    tags: ["frontend", "auth"],
-    status: "In Progress",
-    createdAt: "2024-01-13",
-    dueDate: "2024-01-22",
-    comments: [],
-  },
-  "4": {
-    id: "4",
-    title: "Project setup",
-    description: "Initialize Next.js project with TypeScript and Tailwind",
-    priority: "low",
-    assignee: "John",
-    tags: ["setup", "config"],
-    status: "Done",
-    createdAt: "2024-01-10",
-    dueDate: "2024-01-12",
-    comments: [],
-  },
-};
-
 export function DetailTaskRoute() {
-  const params = useParams();
-  const taskId = params.id as string;
-  const task = taskData[taskId as keyof typeof taskData];
+  const { taskId } = useParams();
+  const task = getItemLocalStorage("tasks")?.find(
+    (task: { id: string | number }) => String(task.id) === taskId,
+  );
+  console.log("🚀 ~ DetailTaskRoute ~ task:", task);
 
   if (!task) {
     return (
@@ -124,7 +62,7 @@ export function DetailTaskRoute() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen p-4">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-6">
@@ -179,38 +117,6 @@ export function DetailTaskRoute() {
                 </p>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Comments ({task.comments.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {task.comments.length > 0 ? (
-                  <div className="space-y-4">
-                    {task.comments.map((comment) => (
-                      <div
-                        key={comment.id}
-                        className="border-l-2 border-gray-200 pl-4"
-                      >
-                        <div className="mb-1 flex items-center gap-2">
-                          <span className="text-sm font-medium">
-                            {comment.author}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {comment.timestamp}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-700">
-                          {comment.content}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500">No comments yet.</p>
-                )}
-              </CardContent>
-            </Card>
           </div>
 
           {/* Sidebar */}
@@ -220,27 +126,38 @@ export function DetailTaskRoute() {
                 <CardTitle className="text-lg">Task Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
+                {/* <div className="flex items-center gap-3">
                   <User className="h-4 w-4 text-gray-500" />
                   <div>
                     <p className="text-sm font-medium">Assignee</p>
                     <p className="text-sm text-gray-600">{task.assignee}</p>
                   </div>
-                </div>
+                </div> */}
 
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <div>
+                    <p className="text-sm font-medium">Created At</p>
+                    <p className="text-sm text-gray-600">
+                      {format(new Date(task.createdAt), "PPP 'at' p")}
+                    </p>
+                  </div>
+                </div>
                 <Separator />
 
                 <div className="flex items-center gap-3">
                   <Calendar className="h-4 w-4 text-gray-500" />
                   <div>
                     <p className="text-sm font-medium">Due Date</p>
-                    <p className="text-sm text-gray-600">{task.dueDate}</p>
+                    <p className="text-sm text-gray-600">
+                      {format(new Date(task.dueDate), "PPP 'at' p")}
+                    </p>
                   </div>
                 </div>
 
-                <Separator />
+                {/* <Separator /> */}
 
-                <div className="flex items-start gap-3">
+                {/* <div className="flex items-start gap-3">
                   <Tag className="mt-0.5 h-4 w-4 text-gray-500" />
                   <div>
                     <p className="mb-2 text-sm font-medium">Tags</p>
@@ -256,11 +173,11 @@ export function DetailTaskRoute() {
                       ))}
                     </div>
                   </div>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
 
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Activity</CardTitle>
               </CardHeader>
@@ -271,16 +188,16 @@ export function DetailTaskRoute() {
                     <span className="text-gray-600">
                       Task created on {task.createdAt}
                     </span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                  </div> */}
+            {/* <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-green-500"></div>
                     <span className="text-gray-600">
                       Assigned to {task.assignee}
                     </span>
-                  </div>
-                </div>
+                  </div> */}
+            {/* </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
       </div>
