@@ -1,18 +1,55 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit, Trash2, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { getItemLocalStorage } from "@/utils/local-storage";
 import { Separator } from "@/components/ui/separator";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { Textarea } from "@/components/ui/textarea";
+import type { Task } from "@/types";
+
+const formSchema = z.object({
+  description: z.string().min(1, "Description is required"),
+});
 
 export function DetailTaskRoute() {
   const { taskId } = useParams();
+  const [editable, setEditable] = useState<boolean>(false);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
   const task = getItemLocalStorage("tasks")?.find(
     (task: { id: string | number }) => String(task.id) === taskId,
   );
-  console.log("🚀 ~ DetailTaskRoute ~ task:", task);
+
+  function onSubmitDescription(values: z.infer<typeof formSchema>) {
+    if (task) {
+      const updatedTask = {
+        ...task,
+        description: values.description,
+      };
+      const tasks = getItemLocalStorage("tasks") || [];
+      const updatedTasks = tasks.map((t: Task) =>
+        t.id === task.id ? updatedTask : t,
+      );
+      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+      setEditable(false);
+    }
+    form.reset();
+  }
 
   if (!task) {
     return (
@@ -35,32 +72,6 @@ export function DetailTaskRoute() {
     );
   }
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "low":
-        return "bg-green-100 text-green-800 border-green-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "To Do":
-        return "bg-gray-100 text-gray-800";
-      case "In Progress":
-        return "bg-blue-100 text-blue-800";
-      case "Done":
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   return (
     <div className="min-h-screen p-4">
       <div className="mx-auto max-w-4xl">
@@ -78,24 +89,10 @@ export function DetailTaskRoute() {
               <h1 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl">
                 {task.title}
               </h1>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge className={getStatusColor(task.status)}>
-                  {task.status}
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className={getPriorityColor(task.priority)}
-                >
-                  {task.priority} priority
-                </Badge>
-              </div>
+              <div className="flex flex-wrap items-center gap-2"></div>
             </div>
 
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
               <Button variant="outline" size="sm">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
@@ -108,13 +105,64 @@ export function DetailTaskRoute() {
           {/* Main Content */}
           <div className="space-y-6 lg:col-span-2">
             <Card>
-              <CardHeader>
+              {/* <CardHeader>
                 <CardTitle>Description</CardTitle>
-              </CardHeader>
+              </CardHeader> */}
               <CardContent>
-                <p className="leading-relaxed text-gray-700">
-                  {task.description}
-                </p>
+                {!editable ? (
+                  <div>
+                    <div className="flex justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditable(true);
+                        }}
+                      >
+                        <Edit />
+                      </Button>
+                    </div>
+                    <p className="leading-relaxed text-gray-700">
+                      {task.description}
+                    </p>
+                  </div>
+                ) : (
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(onSubmitDescription)}
+                      className="mx-auto max-w-3xl space-y-8 py-10"
+                    >
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        defaultValue={task.description || ""}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Add Your Task Description"
+                                className="resize-none"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex justify-end gap-2">
+                        <Button type="submit">Save</Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditable(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -126,14 +174,6 @@ export function DetailTaskRoute() {
                 <CardTitle className="text-lg">Task Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* <div className="flex items-center gap-3">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <p className="text-sm font-medium">Assignee</p>
-                    <p className="text-sm text-gray-600">{task.assignee}</p>
-                  </div>
-                </div> */}
-
                 <div className="flex items-center gap-3">
                   <Calendar className="h-4 w-4 text-gray-500" />
                   <div>
@@ -154,50 +194,8 @@ export function DetailTaskRoute() {
                     </p>
                   </div>
                 </div>
-
-                {/* <Separator /> */}
-
-                {/* <div className="flex items-start gap-3">
-                  <Tag className="mt-0.5 h-4 w-4 text-gray-500" />
-                  <div>
-                    <p className="mb-2 text-sm font-medium">Tags</p>
-                    <div className="flex flex-wrap gap-1">
-                      {task.tags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="secondary"
-                          className="text-xs"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div> */}
               </CardContent>
             </Card>
-
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                    <span className="text-gray-600">
-                      Task created on {task.createdAt}
-                    </span>
-                  </div> */}
-            {/* <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                    <span className="text-gray-600">
-                      Assigned to {task.assignee}
-                    </span>
-                  </div> */}
-            {/* </div>
-              </CardContent>
-            </Card> */}
           </div>
         </div>
       </div>
