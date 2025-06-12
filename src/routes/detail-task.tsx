@@ -11,12 +11,22 @@ import { Separator } from "@/components/ui/separator";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import type { Task } from "@/types";
@@ -32,7 +42,7 @@ export function DetailTaskRoute() {
     resolver: zodResolver(formSchema),
   });
   const task = getItemLocalStorage("tasks")?.find(
-    (task: { id: string | number }) => String(task.id) === taskId,
+    (task: { id: string }) => String(task.id) === taskId,
   );
 
   function onSubmitDescription(values: z.infer<typeof formSchema>) {
@@ -93,10 +103,29 @@ export function DetailTaskRoute() {
             </div>
 
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      your account and remove your data from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction>Continue</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </div>
@@ -122,7 +151,8 @@ export function DetailTaskRoute() {
                         <Edit />
                       </Button>
                     </div>
-                    <p className="leading-relaxed text-gray-700">
+
+                    <p className="min-h-36 leading-relaxed text-gray-700">
                       {task.description}
                     </p>
                   </div>
