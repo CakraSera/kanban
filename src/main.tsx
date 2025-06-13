@@ -13,7 +13,7 @@ createRoot(document.getElementById("root")!).render(
       <Routes>
         <Route element={<LayoutRoute />}>
           <Route path="/" element={<HomeRoute />} />
-          <Route path="/About" element={<AboutRoute />} />
+          <Route path="/about" element={<AboutRoute />} />
           <Route path="/task/:taskId" element={<DetailTaskRoute />} />
           <Route path="*" element={<div>404 - Not Found</div>} />
         </Route>

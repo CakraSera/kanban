@@ -31,9 +31,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-type addNewTaskProps = {
-  addNewTask: (task: Task) => void;
-};
+import { useBoardContext } from "@/context/BoardContext";
 
 const taskFormSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
@@ -42,7 +40,8 @@ const taskFormSchema = z.object({
   dueDate: z.date(),
 });
 
-export function TaskForm({ addNewTask }: addNewTaskProps) {
+export function TaskForm() {
+  const { dispatch } = useBoardContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [status, setStatus] = useState<string>("TODO");
 
@@ -69,7 +68,8 @@ export function TaskForm({ addNewTask }: addNewTaskProps) {
           ? values.dueDate
           : new Date(values.dueDate),
     };
-    addNewTask(task);
+    dispatch({ type: "ADD_TASK", payload: task });
+
     setIsOpen(false);
   }
 

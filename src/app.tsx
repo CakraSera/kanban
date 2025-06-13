@@ -1,8 +1,3 @@
-import { useEffect, useState } from "react";
-import {
-  getItemLocalStorage,
-  setItemLocalStorage,
-} from "@/utils/local-storage";
 import {
   DndContext,
   type DragEndEvent,
@@ -11,12 +6,14 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { useBoardContext } from "@/context/BoardContext";
 import { Tasks } from "@/data/index";
 import type { Task, Column } from "./types";
 import { TaskForm } from "./components/task-add-form";
 import { TaskColumn } from "./components/task-colomn";
 
 export function App() {
+  const { state, dispatch } = useBoardContext();
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
@@ -30,24 +27,6 @@ export function App() {
       },
     }),
   );
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const tasksLocalStorage = getItemLocalStorage("tasks");
-    return (tasksLocalStorage as Task[]) || Tasks;
-  });
-
-  const columns: Column[] = [
-    { slug: "TODO", name: "Todo" },
-    { slug: "IN_PROGRESS", name: "In Progress" },
-    { slug: "DONE", name: "Done" },
-  ];
-
-  useEffect(() => {
-    setItemLocalStorage("tasks", tasks);
-  }, [tasks]);
-
-  function addNewTask(task: Task) {
-    setTasks([...tasks, task]);
-  }
 
   function editTask(titleTask: string, id: number | string) {
     const taskToEdit = tasks.find((task) => task.id === id);
@@ -61,15 +40,9 @@ export function App() {
   }
 
   function deleteTask(id: number | string) {
+    dispatch({ type: "DELETE_TASK", payload: id });
     const newTodos = tasks.filter((task) => task.id != id);
     setTasks(newTodos);
-  }
-
-  function toggleTaskCompletion(value: boolean, taskId: number | string) {
-    const newTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, completed: value, status: "DONE" } : task,
-    );
-    setTasks(newTasks);
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -80,11 +53,10 @@ export function App() {
     const taskId = active.id as string;
     const newStatus = over.id as Task["status"];
 
-    setTasks(() =>
-      tasks.map((task) =>
-        task.id !== taskId ? task : { ...task, status: newStatus },
-      ),
-    );
+    dispatch({
+      type: "DRAG_TASK",
+      payload: { id: taskId, status: newStatus },
+    });
   }
 
   return (
@@ -94,18 +66,15 @@ export function App() {
           Kanban Board
         </h1>
         <div className="flex justify-end pb-4">
-          <TaskForm addNewTask={addNewTask} />
+          <TaskForm />
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-            {columns.map((column) => (
+            {state?.columns.map((column) => (
               <TaskColumn
                 key={column.slug}
                 column={column}
-                tasks={tasks}
-                onDelete={deleteTask}
-                onEdit={editTask}
-                onToggleCompletion={toggleTaskCompletion}
+                tasks={state.tasks}
               />
             ))}
           </DndContext>

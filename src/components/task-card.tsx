@@ -15,20 +15,14 @@ import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { useDraggable } from "@dnd-kit/core";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useBoardContext } from "@/context/BoardContext";
 
 type TaskCardProps = {
   task: Task;
-  onEdit: (titleTask: string, id: number | string) => void;
-  onDelete: (taskId: number | string) => void;
-  onToggleCompletion: (value: boolean, taskId: number | string) => void;
 };
 
-export function TaskCard({
-  task,
-  onToggleCompletion,
-  onEdit,
-  onDelete,
-}: TaskCardProps) {
+export function TaskCard({ task }: TaskCardProps) {
+  const { dispatch } = useBoardContext();
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -52,7 +46,10 @@ export function TaskCard({
       console.error("Please enter a task");
       return;
     }
-    onEdit(titleTask, task.id);
+    dispatch({
+      type: "EDIT_TASK",
+      payload: { id: task.id, title: titleTask },
+    });
     setEdit(false);
   }
 
@@ -73,8 +70,13 @@ export function TaskCard({
               <Checkbox
                 id="task"
                 checked={task.completed}
-                onCheckedChange={() =>
-                  onToggleCompletion(!task.completed, task.id)
+                onCheckedChange={
+                  () =>
+                    dispatch({
+                      type: "TOGGLE_TASK_COMPLETION",
+                      payload: { id: task.id, completed: !task.completed },
+                    })
+                  // onToggleCompletion(!task.completed, task.id)
                 }
               />
               <Label htmlFor="task">
@@ -132,7 +134,9 @@ export function TaskCard({
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => onDelete(task.id)}
+                    onClick={() =>
+                      dispatch({ type: "DELETE_TASK", payload: task.id })
+                    }
                   >
                     <Trash2 className="h-4 w-4" />
                     <span className="sr-only">Delete</span>

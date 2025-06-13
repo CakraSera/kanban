@@ -5,18 +5,9 @@ import type { Column, Task } from "@/types";
 type TaskColumnProps = {
   column: Column;
   tasks: Task[];
-  onDelete: (id: number | string) => void;
-  onEdit: (title: string, id: number | string) => void;
-  onToggleCompletion: (value: boolean, taskId: number | string) => void;
 };
 
-export function TaskColumn({
-  column,
-  tasks,
-  onDelete,
-  onEdit,
-  onToggleCompletion,
-}: TaskColumnProps) {
+export function TaskColumn({ column, tasks }: TaskColumnProps) {
   const { setNodeRef } = useDroppable({
     id: column.slug,
   });
@@ -36,12 +27,7 @@ export function TaskColumn({
         ) : (
           tasksInColumn.map((task) => (
             <li key={task.id}>
-              <TaskCard
-                task={task}
-                onDelete={onDelete}
-                onEdit={onEdit}
-                onToggleCompletion={onToggleCompletion}
-              />
+              <TaskCard task={task} />
             </li>
           ))
         )}
