@@ -7,8 +7,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useBoardContext } from "@/context/BoardContext";
-import { Tasks } from "@/data/index";
-import type { Task, Column } from "./types";
+import type { Task } from "./types";
 import { TaskForm } from "./components/task-add-form";
 import { TaskColumn } from "./components/task-colomn";
 
@@ -27,23 +26,6 @@ export function App() {
       },
     }),
   );
-
-  function editTask(titleTask: string, id: number | string) {
-    const taskToEdit = tasks.find((task) => task.id === id);
-    if (!taskToEdit) {
-      console.error("Task not found");
-      return;
-    }
-    const updatedTask = { ...taskToEdit, title: titleTask };
-    const newTasks = tasks.map((task) => (task.id === id ? updatedTask : task));
-    setTasks(newTasks);
-  }
-
-  function deleteTask(id: number | string) {
-    dispatch({ type: "DELETE_TASK", payload: id });
-    const newTodos = tasks.filter((task) => task.id != id);
-    setTasks(newTodos);
-  }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;

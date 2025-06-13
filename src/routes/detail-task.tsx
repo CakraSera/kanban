@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,13 +30,16 @@ import {
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import type { Task } from "@/types";
+import { useBoardContext } from "@/context/BoardContext";
 
 const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
 });
 
 export function DetailTaskRoute() {
+  const navigate = useNavigate();
   const { taskId } = useParams();
+  const { dispatch } = useBoardContext();
   const [editable, setEditable] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,6 +62,17 @@ export function DetailTaskRoute() {
       setEditable(false);
     }
     form.reset();
+  }
+
+  function handleDeleteTask() {
+    if (task) {
+      dispatch({
+        type: "DELETE_TASK",
+        payload: task.id,
+      });
+      localStorage.removeItem("tasks");
+    }
+    navigate("/");
   }
 
   if (!task) {
@@ -122,7 +136,9 @@ export function DetailTaskRoute() {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Continue</AlertDialogAction>
+                    <AlertDialogAction onClick={() => handleDeleteTask()}>
+                      Continue
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
