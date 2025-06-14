@@ -19,7 +19,6 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
-import type { Task } from "@/types";
 import { DatePicker } from "@/components/ui/date-picker";
 import {
   Form,

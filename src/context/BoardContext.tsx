@@ -1,12 +1,40 @@
 import { Tasks } from "@/data";
-import type { Task } from "@/types";
+import type { Column, Task } from "@/types";
 import {
   setItemLocalStorage,
   getItemLocalStorage,
 } from "@/utils/local-storage";
 import { createContext, useEffect, useReducer, useContext } from "react";
+import type { Dispatch } from "react";
 
-function kanbanReducer(state: any, action: any) {
+type BoardContextState = {
+  tasks: Task[];
+  columns: Column[];
+};
+
+type BoardContextAction =
+  | { type: "ADD_TASK"; payload: Task }
+  | {
+      type: "EDIT_TASK";
+      payload: { id: string; title: string };
+    }
+  | {
+      type: "TOGGLE_TASK_COMPLETION";
+      payload: { id: string; completed: boolean };
+    }
+  | {
+      type: "DELETE_TASK";
+      payload: string;
+    }
+  | {
+      type: "DRAG_TASK";
+      payload: { id: string; status: Task["status"] };
+    };
+
+function kanbanReducer(
+  state: BoardContextState,
+  action: BoardContextAction,
+): BoardContextState {
   switch (action.type) {
     case "ADD_TASK": {
       return { ...state, tasks: [...state.tasks, action.payload] };
@@ -52,14 +80,19 @@ function kanbanReducer(state: any, action: any) {
   }
 }
 
-const BoardContext = createContext(null);
+type BoardContextType = {
+  state: BoardContextState;
+  dispatch: Dispatch<BoardContextAction>;
+};
+
+const BoardContext = createContext<BoardContextType | null>(null);
 
 export function BoardContextProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const initialState = {
+  const initialState: BoardContextState = {
     tasks: (() => {
       const tasks = getItemLocalStorage("tasks");
       if (!tasks) return Tasks;
@@ -81,8 +114,7 @@ export function BoardContextProvider({
 
   useEffect(() => {
     setItemLocalStorage("tasks", state.tasks);
-  }, [initialState.tasks]);
-
+  }, [state.tasks]);
   return (
     <BoardContext.Provider value={{ state, dispatch }}>
       {children}

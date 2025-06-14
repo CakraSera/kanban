@@ -7,7 +7,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useBoardContext } from "@/context/BoardContext";
-import type { Task } from "./types";
+import type { Column, Task } from "./types";
 import { TaskForm } from "./components/task-add-form";
 import { TaskColumn } from "./components/task-colomn";
 
@@ -52,7 +52,7 @@ export function App() {
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-            {state?.columns.map((column) => (
+            {state?.columns.map((column: Column) => (
               <TaskColumn
                 key={column.slug}
                 column={column}
