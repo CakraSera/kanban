@@ -16,7 +16,7 @@ type BoardContextAction =
   | { type: "ADD_TASK"; payload: Task }
   | {
       type: "EDIT_TASK";
-      payload: { id: string; title: string };
+      payload: { id: string; task: Task };
     }
   | {
       type: "TOGGLE_TASK_COMPLETION";
@@ -40,10 +40,9 @@ function kanbanReducer(
       return { ...state, tasks: [...state.tasks, action.payload] };
     }
     case "EDIT_TASK": {
+      const newTask = action.payload.task;
       const updatedTasks = state.tasks.map((task: Task) =>
-        task.id === action.payload.id
-          ? { ...task, title: action.payload.title }
-          : task,
+        task.id === action.payload.id ? newTask : task,
       );
       return { ...state, tasks: updatedTasks };
     }

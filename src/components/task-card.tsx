@@ -46,9 +46,14 @@ export function TaskCard({ task }: TaskCardProps) {
       console.error("Please enter a task");
       return;
     }
+    const updatedTask = {
+      ...task,
+      title: titleTask,
+    };
+
     dispatch({
       type: "EDIT_TASK",
-      payload: { id: task.id, title: titleTask },
+      payload: { id: task.id, task: updatedTask },
     });
     setEdit(false);
   }

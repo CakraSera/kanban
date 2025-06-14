@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,7 +29,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
-import type { Task } from "@/types";
 import { useBoardContext } from "@/context/BoardContext";
 
 const formSchema = z.object({
@@ -39,14 +38,13 @@ const formSchema = z.object({
 export function DetailTaskRoute() {
   const navigate = useNavigate();
   const { taskId } = useParams();
-  const { dispatch } = useBoardContext();
+  const { state, dispatch } = useBoardContext();
   const [editable, setEditable] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
-  const task = getItemLocalStorage("tasks")?.find(
-    (task: { id: string }) => String(task.id) === taskId,
-  );
+
+  const task = state.tasks.find((task) => String(task.id) === taskId);
 
   function onSubmitDescription(values: z.infer<typeof formSchema>) {
     if (task) {
@@ -54,11 +52,10 @@ export function DetailTaskRoute() {
         ...task,
         description: values.description,
       };
-      const tasks = getItemLocalStorage("tasks") || [];
-      const updatedTasks = tasks.map((t: Task) =>
-        t.id === task.id ? updatedTask : t,
-      );
-      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+      dispatch({
+        type: "EDIT_TASK",
+        payload: { id: task.id, task: updatedTask },
+      });
       setEditable(false);
     }
     form.reset();
@@ -70,9 +67,8 @@ export function DetailTaskRoute() {
         type: "DELETE_TASK",
         payload: task.id,
       });
-      localStorage.removeItem("tasks");
+      navigate("/");
     }
-    navigate("/");
   }
 
   if (!task) {
