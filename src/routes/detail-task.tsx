@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit, Trash2, Calendar } from "lucide-react";
 import { format } from "date-fns";
-import { getItemLocalStorage } from "@/utils/local-storage";
 import { Separator } from "@/components/ui/separator";
 import {
   Form,
