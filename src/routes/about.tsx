@@ -6,7 +6,9 @@ export function AboutRoute() {
       <div className="w-full space-y-8">
         {/* Why Section */}
         <section className="rounded-lg bg-white p-6 shadow-md">
-          <h2 className="font-semibol mb-4 text-2xl">Why Kanban?</h2>
+          <h2 className="font-semibol mb-4 text-2xl font-semibold">
+            Why Kanban?
+          </h2>
           <p className="mb-4 text-gray-700">
             Kanban was developed to help teams visualize their work, limit
             work-in-progress, and maximize efficiency. It originated from
