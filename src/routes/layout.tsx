@@ -1,5 +1,4 @@
-import { NavLink } from "react-router";
-import { Outlet } from "react-router";
+import { NavLink, Outlet } from "react-router";
 
 export function LayoutRoute() {
   return (
@@ -27,9 +26,11 @@ export function LayoutRoute() {
           </NavLink>
         </nav>
       </header>
+
       <main className="container mx-auto flex-1 px-4 py-8">
         <Outlet />
       </main>
+
       <footer className="flex h-16 items-center justify-center bg-gray-800 text-white">
         <p>
           {new Date().getFullYear()}&copy; Rakhel Cakra K.Sera. All rights

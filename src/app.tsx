@@ -7,9 +7,9 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useBoardContext } from "@/context/BoardContext";
-import type { Column, Task } from "./types";
-import { TaskForm } from "./components/task-add-form";
-import { TaskColumn } from "./components/task-colomn";
+import type { Column, Task } from "@/types";
+import { TaskForm } from "@/components/task-add-form";
+import { TaskColumn } from "@/components/task-colomn";
 
 export function App() {
   const { state, dispatch } = useBoardContext();

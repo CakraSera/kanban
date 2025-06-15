@@ -114,7 +114,7 @@ export function TaskCard({ task }: TaskCardProps) {
               <Tooltip>
                 <TooltipTrigger>
                   <Button asChild variant="outline">
-                    <Link to={`/task/${task.id}`}>
+                    <Link to={`/tasks/${task.id}`}>
                       <View />
                     </Link>
                   </Button>
